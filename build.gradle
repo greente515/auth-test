@@ -1,0 +1,74 @@
+plugins {
+    id 'org.springframework.boot' version '2.3.4.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'org.asciidoctor.convert' version '1.5.8'
+    id 'java'
+    id 'org.sonarqube' version "3.1.1"
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+//sourceCompatibility = '1.8'
+
+sonarqube {
+    properties {
+        property "sonar.host.url", "http://localhost:9000"
+        property "sonar.projectKey", "oauth2"
+        property "sonar.sources", "src/main/java"
+        property "sonar.projectName", "oauth2"
+        property "sonar.sourceEncoding", "UTF-8"
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('snippetsDir', file("build/generated-snippets"))
+}
+
+dependencies {
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa' //jpa
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc' //db
+    compile group: 'org.modelmapper', name: 'modelmapper', version: '2.3.7'
+
+    implementation 'org.springframework.boot:spring-boot-starter-security' //security
+    compile group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: '2.3.4.RELEASE'
+    compile group: 'org.springframework.security.oauth.boot', name: 'spring-security-oauth2-autoconfigure', version: '2.3.4.RELEASE'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    // swagger
+    compile 'io.springfox:springfox-swagger2:2.9.2'
+    compile 'io.springfox:springfox-swagger-ui:2.9.2'
+
+    implementation 'org.springframework.session:spring-session-jdbc' //db
+    compileOnly 'org.projectlombok:lombok' //lombok
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'com.h2database:h2' //h2 db
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') { //junit
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc' //rest docs
+    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+test {
+    outputs.dir snippetsDir
+    useJUnitPlatform()
+}
+
+asciidoctor {
+    inputs.dir snippetsDir
+    dependsOn test
+}
